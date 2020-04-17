@@ -1,6 +1,5 @@
-import React, { Component } from 'react'
-import { Mutation } from 'react-apollo'
-import gql from 'graphql-tag'
+import React from 'react'
+import { gql, useMutation } from '@apollo/client'
 import './send-notification-bar.css'
 
 const INCREMENT_COUNT = gql`
@@ -15,22 +14,23 @@ const DECREMENT_COUNT = gql`
   }
 `
 
-export default class NotificationBar extends Component {
-  render() {
-    return (
-      <div className="send-notification-bar">
-        <p>🔥🔥 Send a notification using local state: 🔥🔥</p>
-        <Mutation mutation={INCREMENT_COUNT}>
-          {incrementCount => {
-            return <button onClick={incrementCount}>Increment counter</button>
-          }}
-        </Mutation>
-        <Mutation mutation={DECREMENT_COUNT}>
-          {decrementCount => {
-            return <button onClick={decrementCount}>Decrement counter</button>
-          }}
-        </Mutation>
-      </div>
-    )
-  }
+export default function NotificationBar() {
+  const [incrementCount, data] = useMutation(INCREMENT_COUNT)
+  const [decrementCount] = useMutation(DECREMENT_COUNT)
+  console.log(data)
+  return (
+    <div className="send-notification-bar">
+      <p>
+        <span role="img" aria-label="icon">
+          🔥🔥
+        </span>{' '}
+        Send a notification using local state:{' '}
+        <span role="img" aria-label="icon">
+          🔥🔥
+        </span>
+      </p>
+      <button onClick={incrementCount}>Increment counter</button>
+      <button onClick={decrementCount}>Decrement counter</button>
+    </div>
+  )
 }

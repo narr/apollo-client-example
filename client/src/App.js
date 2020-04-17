@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ApolloProvider } from 'react-apollo'
+import { ApolloProvider } from '@apollo/client'
 import './App.css'
 import Search from './Search'
 import NotificationBar from './NotificationBar'

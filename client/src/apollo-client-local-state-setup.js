@@ -1,33 +1,50 @@
-// docs: https://www.apollographql.com/docs/link/links/state.html
-import { withClientState } from 'apollo-link-state'
+import { InMemoryCache, gql } from '@apollo/client'
 import { COUNT_QUERY } from './graphql-crud/queries'
 
-const defaults = {
-  count: 0,
+export const cache = new InMemoryCache()
+
+export function writeInitialData() {
+  cache.writeQuery({
+    query: gql`
+      query {
+        count
+      }
+    `,
+    data: {
+      count: 0,
+    },
+  })
 }
 
-export default withClientState({
-  defaults,
-  resolvers: {
+writeInitialData()
+
+export function getResolvers() {
+  return {
     Mutation: {
-      incrementCount: (_, __, { cache }) => {
+      toggleTodo: (_root, variables, { cache }) => {
+        const id = cache.identify({
+          __typename: 'TodoItem',
+          id: variables.id,
+        })
+        cache.modify(id, {
+          completed(value) {
+            return !value
+          },
+        })
+      },
+      incrementCount: (_root, variables, { cache }) => {
         let { count } = cache.readQuery({ query: COUNT_QUERY })
         count = count + 1
-
         const data = { count }
         cache.writeQuery({ query: COUNT_QUERY, data })
-
         return data
       },
-      decrementCount: (_, __, { cache }) => {
+      decrementCount: (_root, variables, { cache }) => {
         let { count } = cache.readQuery({ query: COUNT_QUERY })
         count = count - 1
-
         const data = { count }
         cache.writeQuery({ query: COUNT_QUERY, data })
-
-        return data
       },
     },
-  },
-})
+  }
+}
